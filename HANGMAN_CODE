@@ -1,0 +1,114 @@
+#include <HCSR04.h>
+#include <Servo.h>
+
+
+
+#define enA 9
+#define in1 6
+#define in2 7
+
+
+
+boolean triggered = false;
+Servo myservo1;
+
+
+
+UltraSonicDistanceSensor distanceSensor(13, 12);
+
+
+
+int val;
+int rotDirection = 0;
+
+
+
+void setup () {
+  Serial.begin(9600);
+  myservo1.attach(3);
+  //otro motor, Dc
+
+
+
+  pinMode(10, INPUT);
+
+
+  pinMode(8, OUTPUT);
+
+  pinMode(4, OUTPUT);
+
+
+  pinMode(8, OUTPUT);
+
+  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  digitalWrite(enA, LOW);
+}
+
+
+
+void loop () {
+
+
+
+  int distance = distanceSensor.measureDistanceCm();
+  Serial.println(distance);
+
+
+
+  if (distance <= 40 && !triggered) {
+    digitalWrite(8, HIGH);
+    digitalWrite(4, HIGH);
+
+
+    for (val = 170; val >= 135; val -= 1) { //para cerrar la boca como?
+      myservo1.write(val);
+      delay(15);
+    }
+
+
+    delay(500);
+
+
+
+    digitalWrite(enA, HIGH);
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    delay(1000);
+
+
+
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    delay(1000);
+    digitalWrite(enA, LOW);
+
+
+
+
+
+
+    for (val = 135; val <= 170; val += 1)  {
+      myservo1.write(val);
+      delay(15);  //CAMBIAR PARA MAS LENTITUD
+    }
+
+
+
+
+
+    digitalWrite(8, LOW);
+    triggered = true;
+
+    digitalWrite(4, LOW);
+
+
+
+  }
+  else if (distance >= 40) {
+    triggered = false;
+  }
+}
